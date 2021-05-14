@@ -86,4 +86,5 @@ client.login(process.env.BOT_TOKEN)
 process.on('SIGINT', async () => {
   await deleteRules(await currentRules)
   console.log('deleted stream rules')
+  process.exit(1)
 })
