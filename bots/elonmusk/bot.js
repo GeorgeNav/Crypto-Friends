@@ -61,7 +61,7 @@ client.on('ready', async () => {
       const tweet = json.data.text
       console.log(tweet)
       const tweetsTextChannel = client.channels.cache.get(channelIDs.text.tweets)
-      tweetsTextChannel.send('@everyone Elon: ' + tweet)
+      tweetsTextChannel.send('@everyone tweet: ' + tweet)
     } catch (error) {
       console.log('no tweet atm')
     }
