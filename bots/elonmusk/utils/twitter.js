@@ -110,6 +110,8 @@ const startListeningToElonForever = async () => {
       ])
       message.setTimestamp()
       channel.send(message)
+        .then(console.log)
+        .catch(console.error)
     }
 
     if(tweet.author_id === test.authorID)
