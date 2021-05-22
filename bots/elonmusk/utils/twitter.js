@@ -22,7 +22,7 @@ const test = {
 }
 const streamRules = [
   { value: `from:${test.username}`},
-  { value: `from:${elonmusk.username}` },
+  // { value: `from:${elonmusk.username}` },
 ]
 
 const getRules = async () => {
