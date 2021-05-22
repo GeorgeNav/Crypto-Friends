@@ -65,6 +65,8 @@ const getStream = async () => {
   return stream
 }
 
+delayMiliSeconds = 30000
+
 const listenToElonTweets = async (streamFactory, dataConsumer) => {
   const stream = await streamFactory()
 
@@ -79,12 +81,12 @@ const listenToElonTweets = async (streamFactory, dataConsumer) => {
   })
   stream.on('end', async () => {
     setTimeout(() =>
-      listenToElonTweets(streamFactory, dataConsumer), 60000)
+      listenToElonTweets(streamFactory, dataConsumer), delayMiliSeconds)
     console.log('stream end')
   })
   stream.on('error', () => {
     setTimeout(() =>
-      listenToElonTweets(streamFactory, dataConsumer), 60000)
+      listenToElonTweets(streamFactory, dataConsumer), delayMiliSeconds)
     console.log('stream error')
   })
   stream.on('pause', () => { console.log('stream pause')})
