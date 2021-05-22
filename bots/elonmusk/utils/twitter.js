@@ -97,10 +97,6 @@ const startListeningToElonForever = async () => {
 
     const sendMessage = (tweet, channelID) => {
       const channel = discord.channels.cache.get(channelID)
-      if(!channel)
-        console.log('Channel not found')
-      console.log('channel found', channel)
-    
       const message = new MessageEmbed()
       message.setTitle('Tweet')
       message.setColor('#1DA1F2')
