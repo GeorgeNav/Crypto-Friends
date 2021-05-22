@@ -25,6 +25,8 @@ const streamRules = [
   { value: `from:${elonmusk.username}` },
 ]
 
+let currentRules
+
 const getRules = async () => {
   const response = await needle('get', streamRulesURL, tweetAuth)
   console.log(response.body)
@@ -90,13 +92,8 @@ const listenToElonTweets = async (streamFactory, dataConsumer) => {
     console.log('stream error')
   })
   stream.on('pause', () => { console.log('stream pause')})
-  stream.on('resume', () => {
-    setTimeout(() =>
-      listenToElonTweets(streamFactory, dataConsumer), 90000)
-  })
+  stream.on('resume', () => { console.log('stream resume')})
 }
-
-let currentRules
 
 const startListeningToElonForever = async () => {
   const handleTweet = (tweet) => {
