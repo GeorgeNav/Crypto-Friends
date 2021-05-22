@@ -86,7 +86,6 @@ const listenToElonTweets = async (streamFactory, dataConsumer) => {
     console.log('stream error')
   })
   stream.on('pause', () => { console.log('stream pause')})
-  stream.on('readable', () => { console.log('stream readable')})
   stream.on('resume', () => { console.log('stream resume')})
 }
 
