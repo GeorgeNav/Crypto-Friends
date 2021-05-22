@@ -107,6 +107,7 @@ const startListeningToElonForever = async () => {
           value: `https://twitter.com/${tweet.username}/status/${tweet.id}`,
         },
       ])
+      message.setTimestamp()
       tweetsTextChannel.send(message)
     }
 
