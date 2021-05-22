@@ -90,7 +90,10 @@ const listenToElonTweets = async (streamFactory, dataConsumer) => {
     console.log('stream error')
   })
   stream.on('pause', () => { console.log('stream pause')})
-  stream.on('resume', () => { console.log('stream resume')})
+  stream.on('resume', () => {
+    setTimeout(() =>
+      listenToElonTweets(streamFactory, dataConsumer), 90000)
+  })
 }
 
 let currentRules
