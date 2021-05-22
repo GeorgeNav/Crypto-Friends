@@ -139,5 +139,5 @@ process.once('SIGUSR2', async () => {
 module.exports = {
   startListeningToElonForever,
   currentRules,
-  twitter,
+  // twitter,
 }
