@@ -13,7 +13,7 @@ discord.on('message', (msg) => {
   const text = msg.content.toLowerCase()
 
   if (text.includes('btc') || text.includes('bitcoin'))
-    msg.reply('Very energy inefficient crypto currency')
+    msg.reply('You can\'t buy my Teslas anymore with that trash coin')
   
   /*
   else if(msg.channel.id === channelIDs.peaceful.peaceful)
