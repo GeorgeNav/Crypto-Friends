@@ -18,7 +18,7 @@ const elonmusk = {
 }
 const test = {
   username: 'GeorgeN31729844',
-  authorID: '1395920214261370880',
+  authorID: '1395907457524846598',
 }
 const streamRules = [
   { value: `from:${test.username}`},
@@ -78,7 +78,7 @@ const listenToElonTweets = async (streamFactory, dataConsumer) => {
     } catch (error) {  }
   })
   stream.on('end', () => {
-    // listenToElonTweets(streamFactory, dataConsumer)
+    listenToElonTweets(streamFactory, dataConsumer)
     console.log('stream end')
   })
   stream.on('error', () => {
