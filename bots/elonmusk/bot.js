@@ -6,7 +6,7 @@ const { startListeningToElonForever } = require('./utils/twitter')
 discord.on('ready', async () => {
   console.log(`Logged in as ${discord.user.tag}!`)
   // TODO: create webhook once signed in for elon tweets
-  await startListeningToElonForever()
+  startListeningToElonForever()
 })
 
 discord.on('message', (msg) => {
