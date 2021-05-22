@@ -77,12 +77,14 @@ const listenToElonTweets = async (streamFactory, dataConsumer) => {
       dataConsumer(tweet)
     } catch (error) {  }
   })
-  stream.on('end', () => {
-    listenToElonTweets(streamFactory, dataConsumer)
+  stream.on('end', async () => {
+    setTimeout(() =>
+      listenToElonTweets(streamFactory, dataConsumer), 60000)
     console.log('stream end')
   })
   stream.on('error', () => {
-    listenToElonTweets(streamFactory, dataConsumer)
+    setTimeout(() =>
+      listenToElonTweets(streamFactory, dataConsumer), 60000)
     console.log('stream error')
   })
   stream.on('pause', () => { console.log('stream pause')})
