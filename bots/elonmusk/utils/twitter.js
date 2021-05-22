@@ -22,7 +22,7 @@ const test = {
 }
 const streamRules = [
   { value: `from:${test.username}`},
-  // { value: `from:${elonmusk.username}` },
+  { value: `from:${elonmusk.username}` },
 ]
 
 const getRules = async () => {
@@ -70,15 +70,15 @@ const listenToElonTweets = async (streamFactory, dataConsumer) => {
 
   stream.on('close', () => { console.log('stream close')})
   stream.on('data', (chunk) => {
-    console.log('stream chunk recieved')
     try {
       const json = JSON.parse(chunk)
+      console.log('stream chunk valid')
       const tweet = json.data
       dataConsumer(tweet)
-    } catch (error) { console.log(error) }
+    } catch (error) {  }
   })
   stream.on('end', () => {
-    listenToElonTweets(streamFactory, dataConsumer)
+    // listenToElonTweets(streamFactory, dataConsumer)
     console.log('stream end')
   })
   stream.on('error', () => {
