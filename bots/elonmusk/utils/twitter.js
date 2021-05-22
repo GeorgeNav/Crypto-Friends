@@ -99,7 +99,7 @@ const startListeningToElonForever = async () => {
   const handleTweet = (tweet) => {
     console.log(tweet)
 
-    const sendMessage = (tweet, channelID) => {
+    const sendMessage = async (tweet, channelID) => {
       const channel = discord.channels.cache.get(channelID)
       const message = new MessageEmbed()
       message.setTitle('Tweet')
@@ -111,9 +111,11 @@ const startListeningToElonForever = async () => {
         },
       ])
       message.setTimestamp()
-      channel.send(message)
+      console.log('sending message')
+      await channel.send(message)
         .then(console.log)
         .catch(console.error)
+      console.log('done sending message')
     }
 
     if(tweet.author_id === test.authorID)
