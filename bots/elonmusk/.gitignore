@@ -1,4 +1,3 @@
 .vscode
 node_modules
-./config/auth.json
-login.sh
+config/auth.json
