@@ -22,10 +22,15 @@ const displayInfo = async (message, queue, song, event) => {
   info.setColor('#1DA1F2')
   info.addFields([
     {
-      name: `\`${song.name}\` - \`${song.formattedDuration}\``,
-      value: `Requested by: ${song.user}`,
+      name: `Requested by: ${song.user}`,
+      value: `\`${song.name}\` - \`${song.formattedDuration}\``,
+    },
+    {
+      name: 'Command',
+      value: message.content,
     },
   ])
+  message.delete()
   info.setTimestamp()
   await channel.send(info)
     .catch(console.error)
