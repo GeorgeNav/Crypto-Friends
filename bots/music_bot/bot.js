@@ -19,21 +19,22 @@ const displayInfo = async (message, queue, song, event) => {
   const channel = message.channel
   const info = new MessageEmbed()
   info.setTitle(event)
-  info.setColor('#1DA1F2')
+  info.setColor('#00AAFF')
+  info.setThumbnail(song.thumbnail)
   info.addFields([
     {
-      name: `Requested by: ${song.user}`,
-      value: `\`${song.name}\` - \`${song.formattedDuration}\``,
+      name: 'Song',
+      value: `${song.name} - ${song.formattedDuration}`,
     },
     {
       name: 'Command',
-      value: message.content,
+      value: `\`${message.content}\`\n${song.user}`,
     },
   ])
-  message.delete()
-  info.setTimestamp()
+  info.setURL(song.url)
   await channel.send(info)
     .catch(console.error)
+  message.delete()
 }
 
 discord.distube
