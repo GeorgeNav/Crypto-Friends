@@ -101,17 +101,7 @@ const startListeningToElonForever = async () => {
 
     const sendMessage = async (tweet, channelID) => {
       const channel = discord.channels.cache.get(channelID)
-      const message = new MessageEmbed()
-      message.setTitle('Tweet')
-      message.setColor('#1DA1F2')
-      message.addFields([
-        {
-          name: tweet.text,
-          value: `https://twitter.com/${tweet.username}/status/${tweet.id}`,
-        },
-      ])
-      message.setTimestamp()
-      await channel.send(message)
+      await channel.send(`@everyone https://twitter.com/${tweet.username}/status/${tweet.id}`)
         .catch(console.error)
     }
 
