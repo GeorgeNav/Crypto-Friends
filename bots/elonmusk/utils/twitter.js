@@ -110,7 +110,7 @@ const startListeningToElonForever = async () => {
         ...tweet,
         username: test.username,
       }, channelIDs.text.dev)
-    else // NOTE: it's elon
+    else if(tweet.author_id === elonmusk.authorID)// NOTE: it's elon
       sendMessage({
         ...tweet,
         username: elonmusk.username,
