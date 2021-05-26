@@ -14,7 +14,7 @@ const twitter = new Twitter({
 
 const elonmusk = {
   username: 'elonmusk',
-  authorID: '', // TODO: get elonmusk's author id
+  authorID: '44196397',
 }
 const test = {
   username: 'GeorgeN31729844',
