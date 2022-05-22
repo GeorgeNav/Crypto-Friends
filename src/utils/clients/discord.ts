@@ -1,7 +1,16 @@
-const { Client } = require('discord.js')
-const discord = new Client()
-const auth = require('../config/auth.json')
+import { BitFieldResolvable, Client, Intents, IntentsString } from 'discord.js';
+import auth from 'src/../auth.json';
 
-discord.login(auth.discord.ELON_TOKEN)
+const discordClientFactory = (token: string, intents: BitFieldResolvable<IntentsString, number> = []) => {
+  const discordClient = new Client({
+    intents,
+  });
+  discordClient.login(token);
+  return discordClient;
+}
 
-module.exports = discord
+export const discord = {
+  elonmusk: discordClientFactory(auth.discord.bot.ELONMUSK_APP_TOKEN, [
+    Intents.FLAGS.DIRECT_MESSAGES
+  ]),
+}

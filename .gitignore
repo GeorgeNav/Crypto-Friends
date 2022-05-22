@@ -1,4 +1,4 @@
-**/.vscode
-**/node_modules
-**/auth.json
+.vscode
+node_modules
+auth.json
 login.sh

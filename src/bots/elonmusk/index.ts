@@ -1,23 +1,21 @@
-const discord = require('./utils/discord')
-const Filter = require('bad-words')
-const filter = new Filter()
-const { startListeningToElonForever } = require('./utils/twitter')
+import { discord, twitter } from "src/utils/clients"
+import Filter from "bad-words"
+import discordChannelIDs from "src/utils/discordChannelIDs.json"
 
-discord.on('ready', async () => {
-  console.log(`Logged in as ${discord.user.tag}!`)
-  // TODO: create webhook once signed in for elon tweets
-  startListeningToElonForever()
+const filter = new Filter()
+
+discord.elonmusk.on('ready', async () => {
+  console.log(`Logged in as ${discord.elonmusk.user.tag}!`)
+  twitter.listenToUserTweets()
 })
 
-discord.on('message', (msg) => {
+discord.elonmusk.on('message', (msg) => {
   const text = msg.content.toLowerCase()
 
   if (text.includes('btc') || text.includes('bitcoin'))
-    msg.reply('You can\'t buy my Teslas anymore with that trash coin')
-  
-  /*
-  else if(msg.channel.id === channelIDs.peaceful.peaceful)
+    msg.reply('🤢')
+
+  else if (msg.channel.id === discordChannelIDs.peaceful.general)
     if (filter.isProfane(text))
       msg.reply('Very disapointed in you :(')
-  */
 })

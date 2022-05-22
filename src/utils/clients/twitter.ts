@@ -1,29 +1,15 @@
-const twitterAuth = require('../config/auth.json').twitter
-const channelIDs = require('../config/channelIDs.json')
-const needle = require('needle')
-const discord = require('./discord')
-const { MessageEmbed } = require('discord.js')
+import auth from 'src/../auth.json';
+import { twitterUsers } from "src/utils/constants"
+import discordChannelIDs from 'src/utils/discordChannelIDs.json';
+import needle from 'needle';
+import { discord } from "src/utils/clients";
+
 const streamURL = 'https://api.twitter.com/2/tweets/search/stream?expansions=author_id'
 const streamRulesURL = 'https://api.twitter.com/2/tweets/search/stream/rules'
-const tweetAuth = { headers: { Authorization: `Bearer ${twitterAuth.BEARER_TOKEN}` } }
-
-/* const Twitter = require('twitter-v2') // Twitter
-const twitter = new Twitter({
-  bearer_token: twitterAuth.BEARER_TOKEN,
-}) */
-
-const elonmusk = {
-  username: 'elonmusk',
-  authorID: '44196397',
-}
-const test = {
-  username: 'GeorgeN31729844',
-  authorID: '1395907457524846598',
-}
-const streamRules = [
-  { value: `from:${test.username}`},
-  { value: `from:${elonmusk.username}` },
-]
+const tweetAuth = { headers: { Authorization: `Bearer ${auth.twitter.BEARER_TOKEN}` } }
+const streamRules = Object.values(twitterUsers).map((twitterUser) => ({
+  value: `from:${twitterUser.username}`
+}))
 
 let currentRules
 
@@ -44,9 +30,9 @@ const setRules = async () => {
 }
 
 const deleteRules = async (rules) => {
-  if(!Array.isArray(rules.data))
+  if (!Array.isArray(rules.data))
     return null
-  
+
   const data = {
     delete: {
       ids: rules.data.map((rule) => rule.id),
@@ -63,61 +49,66 @@ const deleteRules = async (rules) => {
 const getStream = async () => {
   await setRules()
   currentRules = await getRules()
-  const stream = await needle.get(streamURL, tweetAuth)
+  const stream = needle.get(streamURL, tweetAuth)
   return stream
 }
 
-delayMiliSeconds = 30000
+const delayMiliSeconds = 30000
 
-const listenToElonTweets = async (streamFactory, dataConsumer) => {
+const listenToTweets = async (streamFactory, dataConsumer) => {
   const stream = await streamFactory()
 
-  stream.on('close', () => { console.log('stream close')})
+  stream.on('close', () => { console.log('stream close') })
   stream.on('data', (chunk) => {
     try {
       const json = JSON.parse(chunk)
       console.log('stream chunk valid')
       const tweet = json.data
       dataConsumer(tweet)
-    } catch (error) {  }
+    } catch (error) { }
   })
   stream.on('end', async () => {
     setTimeout(() =>
-      listenToElonTweets(streamFactory, dataConsumer), delayMiliSeconds)
+      listenToTweets(streamFactory, dataConsumer), delayMiliSeconds)
     console.log('stream end')
   })
   stream.on('error', () => {
     setTimeout(() =>
-      listenToElonTweets(streamFactory, dataConsumer), delayMiliSeconds)
+      listenToTweets(streamFactory, dataConsumer), delayMiliSeconds)
     console.log('stream error')
   })
-  stream.on('pause', () => { console.log('stream pause')})
-  stream.on('resume', () => { console.log('stream resume')})
+  stream.on('pause', () => { console.log('stream pause') })
+  stream.on('resume', () => { console.log('stream resume') })
 }
 
-const startListeningToElonForever = async () => {
-  const handleTweet = (tweet) => {
-    console.log(tweet)
+const listenToUserTweets = async () => {
+  const sendMessage = async (tweet: any, channelID: string) => {
+    const channel = await discord.elonmusk.channels.fetch(channelID)
+    if (channel.isText())
+      await channel.send(`@everyone https://twitter.com/${tweet.username}/status/${tweet.id}`).catch(console.error)
+  }
+  const handleTweet = async (tweet: any) => {
+    console.log("Handling Tweet", tweet)
 
-    const sendMessage = async (tweet, channelID) => {
-      const channel = discord.channels.cache.get(channelID)
-      await channel.send(`@everyone https://twitter.com/${tweet.username}/status/${tweet.id}`)
-        .catch(console.error)
+    switch (tweet.author_id) {
+      case twitterUsers.test.authorID:
+        await sendMessage({
+          ...tweet,
+          username: twitterUsers.test.username,
+        }, discordChannelIDs.text.dev)
+        break
+      case twitterUsers.elonmusk.authorID:
+        sendMessage({
+          ...tweet,
+          username: twitterUsers.elonmusk.username,
+        }, discordChannelIDs.text.tweets)
+        break
+      default:
+        console.log("No user exists for this tweet")
     }
-
-    if(tweet.author_id === test.authorID)
-      sendMessage({
-        ...tweet,
-        username: test.username,
-      }, channelIDs.text.dev)
-    else if(tweet.author_id === elonmusk.authorID)// NOTE: it's elon
-      sendMessage({
-        ...tweet,
-        username: elonmusk.username,
-      }, channelIDs.text.tweets)
   }
 
-  return listenToElonTweets(getStream, handleTweet)
+  return listenToTweets(getStream, handleTweet)
 }
 
 process.on('SIGINT', async () => {
@@ -125,13 +116,13 @@ process.on('SIGINT', async () => {
   console.log('deleted stream rules')
   process.exit(1)
 })
+
 process.once('SIGUSR2', async () => {
   await deleteRules(await currentRules)
   console.log('deleted stream rules')
 })
 
-module.exports = {
-  startListeningToElonForever,
+export const twitter = {
+  listenToUserTweets,
   currentRules,
-  // twitter,
 }
