@@ -9,8 +9,11 @@ const discordClientFactory = (token: string, intents: BitFieldResolvable<Intents
   return discordClient;
 }
 
+const chatOnlyIntents = [
+  Intents.FLAGS.DIRECT_MESSAGES
+]
+
 export const discord = {
-  elonmusk: discordClientFactory(auth.discord.bot.ELONMUSK_APP_TOKEN, [
-    Intents.FLAGS.DIRECT_MESSAGES
-  ]),
+  elonMusk: discordClientFactory(auth.discord.bot.ELONMUSK_APP_TOKEN, chatOnlyIntents),
+  whaleAlert: discordClientFactory(auth.discord.bot.WHALE_ALERT_APP_TOKEN, chatOnlyIntents),
 }

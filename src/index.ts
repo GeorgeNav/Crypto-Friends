@@ -1,1 +1,1 @@
-import "src/bots/elonmusk"
+import "src/bots"

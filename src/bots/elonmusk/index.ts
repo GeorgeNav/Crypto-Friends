@@ -4,12 +4,12 @@ import discordChannelIDs from "src/utils/discordChannelIDs.json"
 
 const filter = new Filter()
 
-discord.elonmusk.on('ready', async () => {
-  console.log(`Logged in as ${discord.elonmusk.user.tag}!`)
+discord.elonMusk.on('ready', async () => {
+  console.log(`Logged in as ${discord.elonMusk.user.tag}!`)
   twitter.listenToUserTweets()
 })
 
-discord.elonmusk.on('message', (msg) => {
+discord.elonMusk.on('message', (msg) => {
   const text = msg.content.toLowerCase()
 
   if (text.includes('btc') || text.includes('bitcoin'))

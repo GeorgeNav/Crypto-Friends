@@ -1,8 +1,9 @@
 import auth from 'src/../auth.json';
-import { twitterUsers } from "src/utils/constants"
+import { TwitterUser, twitterUsers } from "src/utils/constants"
 import discordChannelIDs from 'src/utils/discordChannelIDs.json';
 import needle from 'needle';
 import { discord } from "src/utils/clients";
+import { Client } from 'discord.js';
 
 const streamURL = 'https://api.twitter.com/2/tweets/search/stream?expansions=author_id'
 const streamRulesURL = 'https://api.twitter.com/2/tweets/search/stream/rules'
@@ -82,26 +83,20 @@ const listenToTweets = async (streamFactory, dataConsumer) => {
 }
 
 const listenToUserTweets = async () => {
-  const sendMessage = async (tweet: any, channelID: string) => {
-    const channel = await discord.elonmusk.channels.fetch(channelID)
+  const sendMessage = async (tweet: any, twitterUser: TwitterUser, client: Client) => {
+    const channel = await discord.elonMusk.channels.fetch(discordChannelIDs.text.tweets)
     if (channel.isText())
-      await channel.send(`@everyone https://twitter.com/${tweet.username}/status/${tweet.id}`).catch(console.error)
+      await channel.send(`@everyone https://twitter.com/${twitterUser.username}/status/${tweet.id}`).catch(console.error)
   }
   const handleTweet = async (tweet: any) => {
     console.log("Handling Tweet", tweet)
-
-    switch (tweet.author_id) {
-      case twitterUsers.test.authorID:
-        await sendMessage({
-          ...tweet,
-          username: twitterUsers.test.username,
-        }, discordChannelIDs.text.dev)
+    const authorId: string = tweet.author_id;
+    switch (authorId) {
+      case twitterUsers.elonMusk.authorID:
+        sendMessage(tweet, twitterUsers.elonMusk, discord.elonMusk)
         break
-      case twitterUsers.elonmusk.authorID:
-        sendMessage({
-          ...tweet,
-          username: twitterUsers.elonmusk.username,
-        }, discordChannelIDs.text.tweets)
+      case twitterUsers.whaleAlert.authorID:
+        sendMessage(tweet, twitterUsers.whaleAlert, discord.whaleAlert)
         break
       default:
         console.log("No user exists for this tweet")
