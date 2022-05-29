@@ -85,8 +85,9 @@ const listenToTweets = async (streamFactory, dataConsumer) => {
 const listenToUserTweets = async () => {
   const sendMessage = async (tweet: any, twitterUser: TwitterUser, client: Client) => {
     const channel = await discord.elonMusk.channels.fetch(discordChannelIDs.text.tweets)
+    const everyone = false
     if (channel.isText())
-      await channel.send(`@everyone https://twitter.com/${twitterUser.username}/status/${tweet.id}`).catch(console.error)
+      await channel.send(`${everyone ? '@everyone' : ''} https://twitter.com/${twitterUser.username}/status/${tweet.id}`).catch(console.error)
   }
   const handleTweet = async (tweet: any) => {
     console.log("Handling Tweet", tweet)
