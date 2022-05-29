@@ -3,6 +3,7 @@ export type TwitterUser = {
   authorID: string;
 }
 
+// where to find twitter id: https://tweeterid.com/
 export const twitterUsers = {
   elonMusk: {
     username: 'elonmusk',
