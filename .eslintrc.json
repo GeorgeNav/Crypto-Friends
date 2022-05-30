@@ -4,12 +4,21 @@
     "node": true
   },
   "extends": [
-    "eslint:recommended"
+    "eslint:recommended",
+    "plugin:@typescript-eslint/recommended",
+    "plugin:@typescript-eslint/recommended-requiring-type-checking"
   ],
+  "parser": "@typescript-eslint/parser",
+  "plugins": [
+    "@typescript-eslint"
+  ],
+  "parserOptions": {
+    "project": "./tsconfig.json"
+  },
   "rules": {
     "semi": [
       1,
-      "never"
+      "always"
     ],
     "quotes": [
       1,
@@ -19,9 +28,8 @@
       1,
       2
     ],
-    "no-unused-vars": "warn",
+    "no-unused-vars": "off",
     "no-extra-parens": "warn",
-    "react/prop-types": "warn",
     "space-before-blocks": [
       "warn",
       "always"
@@ -39,6 +47,13 @@
       {
         "before": true,
         "after": true
+      }
+    ],
+    "@typescript-eslint/no-explicit-any": "off",
+    "@typescript-eslint/no-misused-promises": [
+      "error",
+      {
+        "checksVoidReturn": false
       }
     ]
   }
