@@ -79,29 +79,23 @@ const listenToTweets = async(
     listenToTweets(streamFactory, dataHandler)
       .catch(console.error);
   }, delayMiliSeconds);
-  stream.on('data', (chunk) => {
+  stream.on('data', (chunk: Buffer) => {
     try {
-      const json = JSON.parse(chunk as string) as { data: Tweet };
+      const json = JSON.parse(chunk.toString()) as { data: Tweet };
       const tweet = json.data;
       console.log('Tweet:', tweet);
       dataHandler(tweet);
-    } catch (error) {
-      console.log(error);
-    }
+    } catch (error) { }
   });
-  stream.on('end', () => {
-    restartStream();
-    console.log('stream end');
+  ['end', 'error'].forEach((eventName) => {
+    stream.on(eventName, () => {
+      restartStream();
+      console.log(`stream ${eventName}`);
+    });
   });
-  stream.on('error', () => {
-    restartStream();
-    console.log('stream error');
-  });
-  /*
   ['close', 'pause', 'resume'].forEach((eventName: string) => {
-    stream.on(eventName, () => { console.log(`stream ${eventName}`) })
-  })
-  */
+    stream.on(eventName, () => { console.log(`stream ${eventName}`); });
+  });
 };
 
 const listenToUserTweets = async() => {

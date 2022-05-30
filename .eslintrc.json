@@ -30,6 +30,7 @@
     ],
     "no-unused-vars": "off",
     "no-extra-parens": "warn",
+    "no-empty": "off",
     "space-before-blocks": [
       "warn",
       "always"
