@@ -47,7 +47,7 @@ const deleteRules = async (rules) => {
   return response.body
 }
 
-const getStream = async () => {
+const getStream = async (): Promise<NodeJS.ReadableStream> => {
   await setRules()
   currentRules = await getRules()
   const stream = needle.get(streamURL, tweetAuth)
@@ -56,41 +56,51 @@ const getStream = async () => {
 
 const delayMiliSeconds = 30000
 
-const listenToTweets = async (streamFactory, dataConsumer) => {
+const listenToTweets = async (
+  streamFactory: () => Promise<NodeJS.ReadableStream>,
+  dataHandler: (tweet: any) => void
+) => {
   const stream = await streamFactory()
-
-  stream.on('close', () => { console.log('stream close') })
+  const restartStream = () =>
+    setTimeout(() =>
+      listenToTweets(streamFactory, dataHandler), delayMiliSeconds)
   stream.on('data', (chunk) => {
     try {
       const json = JSON.parse(chunk)
       console.log('stream chunk valid')
       const tweet = json.data
-      dataConsumer(tweet)
+      console.log("Tweet:", tweet)
+      dataHandler(tweet)
     } catch (error) { }
   })
   stream.on('end', async () => {
-    setTimeout(() =>
-      listenToTweets(streamFactory, dataConsumer), delayMiliSeconds)
+    restartStream()
     console.log('stream end')
   })
   stream.on('error', () => {
-    setTimeout(() =>
-      listenToTweets(streamFactory, dataConsumer), delayMiliSeconds)
+    restartStream()
     console.log('stream error')
   })
+  stream.on('close', () => { console.log('stream close') })
   stream.on('pause', () => { console.log('stream pause') })
   stream.on('resume', () => { console.log('stream resume') })
 }
 
 const listenToUserTweets = async () => {
   const sendMessage = async (tweet: any, twitterUser: TwitterUser, client: Client) => {
-    const channel = await discord.elonMusk.channels.fetch(discordChannelIDs.text.tweets)
+    const channel = await client.channels.fetch(discordChannelIDs.text.tweets)
     const everyone = false
-    if (channel.isText())
-      await channel.send(`${everyone ? '@everyone ' : ''}https://twitter.com/${twitterUser.username}/status/${tweet.id}`).catch(console.error)
+    if (channel.isText()) {
+      const message = `${everyone ? '@everyone ' : ''}https://twitter.com/${twitterUser.username}/status/${tweet.id}`
+      await channel.send(message).catch(console.error)
+    }
   }
-  const handleTweet = async (tweet: any) => {
-    console.log("Handling Tweet", tweet)
+  type Tweet = {
+    author_id: string;
+    id: string;
+    text: string;
+  }
+  const handleTweet = async (tweet: Tweet) => {
     const authorId: string = tweet.author_id;
     switch (authorId) {
       case twitterUsers.elonMusk.authorID:
