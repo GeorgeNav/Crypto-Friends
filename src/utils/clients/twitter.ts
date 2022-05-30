@@ -11,6 +11,7 @@ const tweetAuth = { headers: { Authorization: `Bearer ${auth.twitter.BEARER_TOKE
 const streamRules = Object.values(twitterUsers).map((twitterUser) => ({
   value: `from:${twitterUser.username}`
 }));
+let currentRules: TwitterStreamRules = [];
 
 type Tweet = {
   author_id: string;
@@ -21,7 +22,6 @@ type TwitterStreamRules = Array<{
   id: string;
   value: string;
 }>
-let currentRules: TwitterStreamRules = [];
 
 type StreamRulesResponse = {
   body: {
