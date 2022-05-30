@@ -1,1 +1,1 @@
-import "src/bots"
+import 'src/bots';

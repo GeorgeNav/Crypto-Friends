@@ -1,5 +1,5 @@
-import { twitter } from "src/utils/clients"
-import "src/bots/elonmusk"
-import "src/bots/whale_alert"
+import 'src/bots/elonmusk';
+import 'src/bots/whale_alert';
+import { twitter } from 'src/utils/clients';
 
-twitter.listenToUserTweets()
+twitter.listenToUserTweets().catch(console.error);

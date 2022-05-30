@@ -1,5 +1,5 @@
-import { discord } from "src/utils/clients"
+import { discord } from 'src/utils/clients';
 
-discord.whaleAlert.on('ready', async () => {
-  console.log(`Logged in as ${discord.whaleAlert.user.tag}!`)
-})
+discord.whaleAlert.on('ready', () => {
+  console.log(`Logged in as ${discord.whaleAlert.user.tag}!`);
+});

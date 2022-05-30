@@ -17,4 +17,4 @@ export const twitterUsers = {
     username: 'whale_alert',
     authorID: '1039833297751302144',
   },
-}
+};
