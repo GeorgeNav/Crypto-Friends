@@ -11,55 +11,71 @@ const tweetAuth = { headers: { Authorization: `Bearer ${auth.twitter.BEARER_TOKE
 const streamRules = Object.values(twitterUsers).map((twitterUser) => ({
   value: `from:${twitterUser.username}`
 }));
-let currentRules: TwitterStreamRules = [];
+const currentRules: TwitterStreamRule[] = [];
 
 type Tweet = {
   author_id: string;
   id: string;
   text: string;
 }
-type TwitterStreamRules = Array<{
+type TwitterStreamRule = {
   id: string;
   value: string;
-}>
-
-type StreamRulesResponse = {
-  body: {
-    data: TwitterStreamRules;
-    meta: {
-      set: string;
-      result_cout: number;
-    }
-  };
 }
-export const getRules = async(): Promise<TwitterStreamRules> => {
-  const response: StreamRulesResponse = await needle('get', streamRulesURL, tweetAuth) as StreamRulesResponse;
-  const rules = response.body.data;
+
+type StreamRulesResponseBody = {
+  data: TwitterStreamRule[] | undefined;
+  meta: {
+    set: string;
+    result_cout: number;
+  }
+  errors: Array<TwitterStreamRule & {
+    title: string;
+    type: string;
+  }> | undefined;
+}
+export const getRules = async(): Promise<TwitterStreamRule[]> => {
+  const body = (await needle('get', streamRulesURL, tweetAuth)).body as StreamRulesResponseBody;
+  const rules = body.data;
   console.log(rules);
   return rules;
 };
 
-const setRules = async(): Promise<TwitterStreamRules> => {
+const setRules = async(): Promise<TwitterStreamRule[]> => {
   const data = { add: streamRules };
-  const response = await needle('post', streamRulesURL, data,
-    { headers: { 'content-type': 'application/json', ...tweetAuth.headers } }) as StreamRulesResponse;
-  const rules = response.body.data;
-  console.log('Twitter Rules Set', rules);
-  currentRules = rules;
-  return rules;
+  const body = (await needle('post', streamRulesURL, data,
+    { headers: { 'content-type': 'application/json', ...tweetAuth.headers } })).body as StreamRulesResponseBody;
+  const addedRules = body.data;
+  let allRules: TwitterStreamRule[] = [];
+  if(addedRules && Array.isArray(addedRules))
+    allRules = addedRules;
+  if(body.errors) {
+    console.error('Errors setting rules', body);
+    if(body.errors.some((e) => e.title === 'DuplicateRule')) {
+      const duplicateRules = body.errors
+        .filter((error) => error.title === 'DuplicateRule')
+        .map((error) => ({
+          id: error.id,
+          value: error.value,
+        }));
+      allRules = [...allRules, ...duplicateRules];
+    }
+  }
+  console.log('Twitter Rules', allRules);
+  return addedRules;
 };
 
-const deleteRules = async(rulesToDelete: TwitterStreamRules) => {
+const deleteRules = async(rulesToDelete: TwitterStreamRule[]) => {
   const data = {
     delete: {
       ids: rulesToDelete.map((rule) => rule.id),
     },
   };
-  const response = await needle('post', streamRulesURL, data,
-    { headers: { 'content-type': 'application/json', ...tweetAuth.headers } }) as StreamRulesResponse;
-  const newRules = response.body.data;
+  const body = (await needle('post', streamRulesURL, data,
+    { headers: { 'content-type': 'application/json', ...tweetAuth.headers } })).body as StreamRulesResponseBody;
+  const newRules = body.data;
   console.log('Twitter Rules After Deletion', newRules);
-  return response.body.data;
+  return body.data;
 };
 
 const getStream = async(): Promise<NodeJS.ReadableStream> => {
