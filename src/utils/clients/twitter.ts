@@ -8,6 +8,10 @@ import { Client } from 'discord.js';
 const streamURL = 'https://api.twitter.com/2/tweets/search/stream?expansions=author_id';
 const streamRulesURL = 'https://api.twitter.com/2/tweets/search/stream/rules';
 const tweetAuth = { headers: { Authorization: `Bearer ${auth.twitter.BEARER_TOKEN}` } };
+const twitterHeaders = {
+  'content-type': 'application/json',
+  ...tweetAuth.headers,
+};
 const streamRules = Object.values(twitterUsers).map((twitterUser) => ({
   value: `from:${twitterUser.username}`
 }));
@@ -22,7 +26,6 @@ type TwitterStreamRule = {
   id: string;
   value: string;
 }
-
 type StreamRulesResponseBody = {
   data: TwitterStreamRule[] | undefined;
   meta: {
@@ -34,17 +37,26 @@ type StreamRulesResponseBody = {
     type: string;
   }> | undefined;
 }
-export const getRules = async(): Promise<TwitterStreamRule[]> => {
-  const body = (await needle('get', streamRulesURL, tweetAuth)).body as StreamRulesResponseBody;
+
+/*
+const getRules = async(): Promise<TwitterStreamRule[]> => {
+  const body = (await needle('get', streamRulesURL, twitterHeaders)).body as StreamRulesResponseBody;
   const rules = body.data;
   console.log(rules);
   return rules;
 };
+*/
 
 const setRules = async(): Promise<TwitterStreamRule[]> => {
   const data = { add: streamRules };
-  const body = (await needle('post', streamRulesURL, data,
-    { headers: { 'content-type': 'application/json', ...tweetAuth.headers } })).body as StreamRulesResponseBody;
+  const body = (
+    await needle('post',
+      streamRulesURL,
+      data,
+      {
+        headers: twitterHeaders,
+      },
+    )).body as StreamRulesResponseBody;
   const addedRules = body.data;
   let allRules: TwitterStreamRule[] = [];
   if(addedRules && Array.isArray(addedRules))
@@ -71,30 +83,39 @@ const deleteRules = async(rulesToDelete: TwitterStreamRule[]) => {
       ids: rulesToDelete.map((rule) => rule.id),
     },
   };
-  const body = (await needle('post', streamRulesURL, data,
-    { headers: { 'content-type': 'application/json', ...tweetAuth.headers } })).body as StreamRulesResponseBody;
+  const body = (
+    await needle('post',
+      streamRulesURL,
+      data,
+      {
+        headers: twitterHeaders,
+      },
+    )).body as StreamRulesResponseBody;
   const newRules = body.data;
   console.log('Twitter Rules After Deletion', newRules);
   return body.data;
 };
 
-const getStream = async(): Promise<NodeJS.ReadableStream> => {
+const getTweetStream = async(): Promise<NodeJS.ReadableStream> => {
   await setRules();
   const stream = needle.get(streamURL, tweetAuth);
   return stream;
 };
-
-const delayMiliSeconds = 30000;
 
 const listenToTweets = async(
   streamFactory: () => Promise<NodeJS.ReadableStream>,
   dataHandler: (tweet: Tweet) => void
 ) => {
   const stream = await streamFactory();
-  const restartStream = () => setTimeout(() => {
-    listenToTweets(streamFactory, dataHandler)
-      .catch(console.error);
-  }, delayMiliSeconds);
+  /*
+  const restartStream = () => {
+    const delayMiliSeconds = 30000;
+    setTimeout(() => {
+      listenToTweets(streamFactory, dataHandler)
+        .catch(console.error);
+    }, delayMiliSeconds);
+  };
+  */
   stream.on('data', (chunk: Buffer) => {
     try {
       const json = JSON.parse(chunk.toString()) as { data: Tweet };
@@ -105,7 +126,7 @@ const listenToTweets = async(
   });
   ['end', 'error'].forEach((eventName) => {
     stream.on(eventName, () => {
-      restartStream();
+      // restartStream();
       console.log(`stream ${eventName}`);
     });
   });
@@ -137,7 +158,7 @@ const listenToUserTweets = async() => {
     }
   };
 
-  return listenToTweets(getStream, handleTweet);
+  return listenToTweets(getTweetStream, handleTweet);
 };
 
 process.on('SIGINT', async() => {
@@ -148,5 +169,4 @@ process.on('SIGINT', async() => {
 
 export const twitter = {
   listenToUserTweets,
-  currentRules,
 };
