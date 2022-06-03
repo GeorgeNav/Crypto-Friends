@@ -144,7 +144,9 @@ const listenToUserTweets = async() => {
       await channel.send(message).catch(console.error);
     }
   };
-  const handleTweet = async(tweet: Tweet) => {
+  const handleTweet = async(tweet: Tweet | undefined) => {
+    if(!tweet)
+      return;
     const authorId: string = tweet.author_id;
     switch (authorId) {
     case twitterUsers.elonMusk.authorID:
